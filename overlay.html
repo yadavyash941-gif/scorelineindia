@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cricbuzz Style Live Score Overlay</title>
+    <style>
+        /* CSS कोड जो पिछले जवाब में दिया गया था, उसे यहाँ पेस्ट करें */
+        body { 
+            margin: 0; background: transparent; overflow: hidden; font-family: Arial, sans-serif;
+        }
+        #scoreboard-container {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 650px; background: #202020; color: #ffffff; border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .score-main {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 15px; background: #000000; border-radius: 8px 8px 0 0;
+            border-bottom: 2px solid #333333;
+        }
+        .team-info { display: flex; align-items: baseline; }
+        .team-name { font-size: 20px; font-weight: bold; margin-right: 15px; color: #cccccc; }
+        .team-score { font-size: 32px; font-weight: 900; color: #ffffff; }
+        .overs-info {
+            font-size: 18px; color: #cccccc; padding: 5px 10px; background: #333333; 
+            border-radius: 4px;
+        }
+        .score-status {
+            display: flex; justify-content: space-between; padding: 5px 15px; 
+            font-size: 14px; background: #2c2c2c; border-radius: 0 0 8px 8px;
+        }
+        #matchStatus { color: #999999; }
+        .required-rate { font-weight: bold; color: #ffffff; }
+        #runRate { color: #f7b731; }
+    </style>
+</head>
+<body>
+
+    <div id="scoreboard-container">
+        <div class="score-main">
+            <div class="team-info">
+                <span class="team-name" id="teamName">TEAM A</span>
+                <span class="team-score" id="liveScore">0/0</span>
+            </div>
+            <div class="overs-info">
+                <span id="liveOvers">0.0 Ov</span>
+            </div>
+        </div>
+        <div class="score-status">
+            <span id="matchStatus">Wait for start...</span>
+            <span class="required-rate">Extras: <span id="extrasCount">0</span></span>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+        // *******************************************************************
+        // !!! अपनी Firebase कॉन्फ़िगरेशन को यहाँ पेस्ट करें !!!
+        // *******************************************************************
+        const firebaseConfig = {
+  apiKey: "AIzaSyCbeKfigcLxiywajpkS9wy5pM3ufHO32QE",
+  authDomain: "quick-scorer.firebaseapp.com",
+  projectId: "quick-scorer",
+  storageBucket: "quick-scorer.firebasestorage.app",
+  messagingSenderId: "756446135459",
+  appId: "1:756446135459:web:0d5be91802ec23faba2b16",
+  measurementId: "G-NMTWZ2LKSZ"
+};
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const scoreRef = db.ref('matchData/teamA'); 
+
+        scoreRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const balls = data.balls || 0;
+                const overs = data.overs || 0;
+                const score = data.score || 0;
+                const wickets = data.wickets || 0;
+                const extras = data.extras || 0;
+
+                // स्कोर और ओवर अपडेट
+                document.getElementById('liveScore').innerText = `${score}/${wickets}`;
+                document.getElementById('liveOvers').innerText = `${overs}.${balls} Ov`;
+                
+                // एक्स्ट्रा काउंट
+                document.getElementById('extrasCount').innerText = extras;
+                
+                // आप यहाँ टीम का नाम भी बदल सकते हैं
+                document.getElementById('teamName').innerText = "INDIA"; 
+                document.getElementById('matchStatus').innerText = "IND Batting"; 
+            }
+        });
+    </script>
+</body>
+</html>
